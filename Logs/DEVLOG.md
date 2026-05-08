@@ -41,3 +41,15 @@ there's no fixed plan pricing.
 **Plan for tomorrow:** Build the audit engine. Hardcoded pricing 
 rules for all 8 tools, research official pricing pages, populate 
 PRICING_DATA.md with source URLs.
+
+## Day 3 — 2026-05-08
+
+**Hours worked:** 5
+
+**What I did:** Finalized the core Audit Engine logic. Implemented vendor-specific rules for all 8 tools and integrated annual billing discounts (20%). Added "Consolidation Heuristics" to detect redundant tools (e.g., Cursor vs. Copilot). Built the Results Page UI, making Monthly Savings the primary hero metric. Verified and documented all pricing sources in PRICING_DATA.md. Set up a basic test suite using Node.js experimental TypeScript support.
+
+**What I learned:** The importance of "defensible" logic—savings recommendations need to be based on actual usage patterns, not just low prices. Also learned how to use the Node.js ESM test runner with --experimental-strip-types for faster logic verification without a heavy test framework.
+
+**Blockers / what I'm stuck on:** Ensuring the logic doesn't suggest "downgrading" to a plan that lacks a feature a user explicitly needs (e.g., SSO or Enterprise security). I'll need to refine the "reasoning" strings to mention these trade-offs.
+
+**Plan for tomorrow:** Integrate the Anthropic API for the personalized AI summary and set up Supabase for lead capture and report storage.

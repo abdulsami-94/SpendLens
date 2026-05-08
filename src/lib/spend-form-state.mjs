@@ -1,18 +1,10 @@
 /** @typedef {import("../types").SpendFormData} SpendFormData */
+import { TOOL_PRICING_CATALOG, getFormPlans } from "./pricingCatalog.ts";
 
-export const TOOLS_CONFIG = [
-  { name: "Cursor", plans: ["Hobby", "Pro", "Business", "Enterprise"] },
-  { name: "GitHub Copilot", plans: ["Individual", "Business", "Enterprise"] },
-  {
-    name: "Claude",
-    plans: ["Free", "Pro", "Max", "Team", "Enterprise", "API Direct"],
-  },
-  { name: "ChatGPT", plans: ["Plus", "Team", "Enterprise", "API Direct"] },
-  { name: "Anthropic", plans: ["API Direct"] },
-  { name: "OpenAI", plans: ["API Direct"] },
-  { name: "Gemini", plans: ["Pro", "Ultra", "API"] },
-  { name: "Windsurf AI", plans: ["Free", "Pro", "Team"] },
-];
+export const TOOLS_CONFIG = TOOL_PRICING_CATALOG.map((tool) => ({
+  name: tool.toolName,
+  plans: [...tool.formPlans],
+}));
 
 export const SPEND_FORM_STORAGE_KEY = "spendlens-spend-form";
 
@@ -35,7 +27,7 @@ function toNonNegativeNumber(value, fallback) {
 }
 
 export function getToolPlans(toolName) {
-  return TOOLS_CONFIG.find((tool) => tool.name === toolName)?.plans ?? [];
+  return getFormPlans(toolName);
 }
 
 /** @returns {SpendFormData} */
