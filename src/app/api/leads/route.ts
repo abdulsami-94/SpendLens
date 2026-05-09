@@ -16,9 +16,19 @@ export async function POST(request: Request) {
       role?: string;
       teamSize?: string;
       auditId: string;
+      website?: string;
     };
 
-    const { email, company, role, teamSize, auditId } = body;
+    const { email, company, role, teamSize, auditId, website } = body;
+
+    // Honeypot validation - reject if honeypot field is filled
+    if (website) {
+      console.warn("Honeypot triggered - rejecting spam submission");
+      return NextResponse.json(
+        { error: "Invalid submission" },
+        { status: 400 }
+      );
+    }
 
     // Save lead to Supabase
     const { error: dbError } = await supabase.from("leads").insert([

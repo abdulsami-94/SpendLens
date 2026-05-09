@@ -34,6 +34,7 @@ export default function LeadCaptureModal({
           role,
           teamSize,
           auditId,
+          website: (e.currentTarget as HTMLFormElement).website?.value || "",
         }),
       });
 
@@ -70,6 +71,15 @@ export default function LeadCaptureModal({
               </p>
 
               <form onSubmit={handleSubmit} className="mt-6 space-y-4">
+                {/* Honeypot field - hidden from users, only bots fill it */}
+                <input
+                  type="text"
+                  name="website"
+                  style={{ display: "none" }}
+                  tabIndex={-1}
+                  autoComplete="off"
+                />
+
                 <div>
                   <label htmlFor="email" className="block text-sm font-medium text-zinc-700">
                     Work Email *

@@ -48,6 +48,28 @@ PRICING_DATA.md with source URLs.
 
 **What I did:** Finalized the core Audit Engine logic. Implemented vendor-specific rules for all 8 tools and integrated annual billing discounts (20%). Added "Consolidation Heuristics" to detect redundant tools (e.g., Cursor vs. Copilot). Built the Results Page UI, making Monthly Savings the primary hero metric. Verified and documented all pricing sources in PRICING_DATA.md. Set up a basic test suite using Node.js experimental TypeScript support.
 
+## Day 4 — 2026-05-09
+
+**Hours worked:** 3
+
+**What I did:** 
+- Supabase setup: created `audits` and `leads` tables, migrated audit store from local file storage to database.
+- Gemini API integration: `/api/summary` endpoint generates personalized ~100-word summaries based on audit results, with fallback templated summary if API fails.
+- Lead capture modal: appears 2 seconds after audit results load (never before), captures email, company, role, team size.
+- Resend email integration: sends transactional confirmation email with link to audit report.
+- Abuse protection: implemented **honeypot field** (hidden `website` field in form; rejects submission if filled by bot).
+
+**Why honeypot over rate limiting:**
+- Zero friction for real users (no false positives)
+- Effective against typical bot spam
+- Simple to implement and maintain
+- No IP/email-based blocking that could accidentally exclude legitimate users
+
+**What I learned:** Honeypot is a pragmatic first-line defense for lead forms. Rate limiting can come later if needed.
+
+**Plan for tomorrow:** Shareable audit URLs with OG tags, UI polish, and deploy to Vercel.
+
+
 **What I learned:** The importance of "defensible" logic—savings recommendations need to be based on actual usage patterns, not just low prices. Also learned how to use the Node.js ESM test runner with --experimental-strip-types for faster logic verification without a heavy test framework.
 
 **Blockers / what I'm stuck on:** Ensuring the logic doesn't suggest "downgrading" to a plan that lacks a feature a user explicitly needs (e.g., SSO or Enterprise security). I'll need to refine the "reasoning" strings to mention these trade-offs.
