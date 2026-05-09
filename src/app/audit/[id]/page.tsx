@@ -2,6 +2,7 @@
 
 import CredexLeadForm from "@/components/CredexLeadForm";
 import NotifySignupForm from "@/components/NotifySignupForm";
+import LeadCaptureModal from "@/components/LeadCaptureModal";
 import type { AuditResult } from "@/lib/auditEngine";
 import { useParams, useRouter } from "next/navigation";
 import { startTransition, useEffect, useState } from "react";
@@ -20,6 +21,9 @@ export default function AuditResultsPage() {
   const auditId = Array.isArray(params.id) ? params.id[0] : params.id;
   const router = useRouter();
   const [loadState, setLoadState] = useState<LoadState>({ status: "loading" });
+  const [summary, setSummary] = useState<string>("");
+  const [summaryLoading, setSummaryLoading] = useState(true);
+  const [showLeadModal, setShowLeadModal] = useState(false);
 
   useEffect(() => {
     let isMounted = true;
@@ -46,6 +50,15 @@ export default function AuditResultsPage() {
 
           startTransition(() => {
             setLoadState({ status: "ready", result });
+            
+            // Fetch summary after audit loads
+            setSummaryLoading(true);
+            void generateSummary(result);
+            
+            // Show lead modal after a short delay
+            setTimeout(() => {
+              setShowLeadModal(true);
+            }, 2000);
           });
         });
       });
@@ -57,6 +70,29 @@ export default function AuditResultsPage() {
       isMounted = false;
     };
   }, [auditId]);
+
+  async function generateSummary(result: AuditResult) {
+    try {
+      const response = await fetch("/api/summary", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          auditResult: result,
+          teamSize: sessionStorage.getItem("teamSize") || "Unknown",
+          primaryUseCase: sessionStorage.getItem("primaryUseCase") || "Mixed",
+        }),
+      });
+
+      if (response.ok) {
+        const { summary: text } = await response.json();
+        setSummary(text);
+      }
+    } catch (error) {
+      console.error("Failed to generate summary:", error);
+    } finally {
+      setSummaryLoading(false);
+    }
+  }
 
   if (loadState.status === "loading") {
     return (
@@ -132,6 +168,19 @@ export default function AuditResultsPage() {
             </div>
           </div>
         </div>
+
+        {summary && (
+          <div className="mt-8 rounded-2xl border border-blue-200 bg-blue-50 p-6 shadow-sm">
+            <h2 className="text-lg font-bold text-blue-950">AI Summary</h2>
+            <p className="mt-3 text-blue-900">{summary}</p>
+          </div>
+        )}
+
+        {summaryLoading && (
+          <div className="mt-8 rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm">
+            <p className="text-zinc-500">Generating personalized summary...</p>
+          </div>
+        )}
 
         <div className="mt-8 rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm">
           {result.isOptimal ? (
@@ -263,6 +312,12 @@ export default function AuditResultsPage() {
           </button>
         </div>
       </div>
+
+      <LeadCaptureModal
+        isOpen={showLeadModal}
+        onClose={() => setShowLeadModal(false)}
+        auditId={auditId}
+      />
     </main>
   );
 }
