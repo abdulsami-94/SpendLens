@@ -21,8 +21,6 @@ export default function AuditResultsPage() {
   const auditId = Array.isArray(params.id) ? params.id[0] : params.id;
   const router = useRouter();
   const [loadState, setLoadState] = useState<LoadState>({ status: "loading" });
-  const [summary, setSummary] = useState<string>("");
-  const [summaryLoading, setSummaryLoading] = useState(true);
   const [showLeadModal, setShowLeadModal] = useState(false);
 
   useEffect(() => {
@@ -51,10 +49,6 @@ export default function AuditResultsPage() {
           startTransition(() => {
             setLoadState({ status: "ready", result });
             
-            // Fetch summary after audit loads
-            setSummaryLoading(true);
-            void generateSummary(result);
-            
             // Show lead modal after a short delay
             setTimeout(() => {
               setShowLeadModal(true);
@@ -70,29 +64,6 @@ export default function AuditResultsPage() {
       isMounted = false;
     };
   }, [auditId]);
-
-  async function generateSummary(result: AuditResult) {
-    try {
-      const response = await fetch("/api/summary", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          auditResult: result,
-          teamSize: sessionStorage.getItem("teamSize") || "Unknown",
-          primaryUseCase: sessionStorage.getItem("primaryUseCase") || "Mixed",
-        }),
-      });
-
-      if (response.ok) {
-        const { summary: text } = await response.json();
-        setSummary(text);
-      }
-    } catch (error) {
-      console.error("Failed to generate summary:", error);
-    } finally {
-      setSummaryLoading(false);
-    }
-  }
 
   if (loadState.status === "loading") {
     return (
@@ -183,6 +154,22 @@ export default function AuditResultsPage() {
         )}
 
         <div className="mt-8 rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm">
+          {result.aiSummary && (
+            <div className="mb-8 rounded-2xl border border-blue-100 bg-blue-50 p-6">
+              <div className="flex items-center gap-2">
+                <div className="flex h-6 w-6 items-center justify-center rounded-full bg-blue-500 text-[10px] text-white">
+                  AI
+                </div>
+                <h2 className="text-sm font-semibold uppercase tracking-wider text-blue-900">
+                  Executive Summary
+                </h2>
+              </div>
+              <p className="mt-3 text-lg leading-relaxed text-blue-950">
+                {result.aiSummary}
+              </p>
+            </div>
+          )}
+
           {result.isOptimal ? (
             <div className="space-y-4">
               <div>

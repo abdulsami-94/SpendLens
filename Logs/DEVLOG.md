@@ -50,28 +50,35 @@ PRICING_DATA.md with source URLs.
 
 ## Day 4 — 2026-05-09
 
-**Hours worked:** 3
+**Hours worked:** 5
 
-**What I did:** 
-- Supabase setup: created `audits` and `leads` tables, migrated audit store from local file storage to database.
-- Gemini API integration: `/api/summary` endpoint generates personalized ~100-word summaries based on audit results, with fallback templated summary if API fails.
-- Lead capture modal: appears 2 seconds after audit results load (never before), captures email, company, role, team size.
-- Resend email integration: sends transactional confirmation email with link to audit report.
-- Abuse protection: implemented **honeypot field** (hidden `website` field in form; rejects submission if filled by bot).
+**What I did:**
+- Supabase setup: created `audits` and `leads` tables, migrated audit store
+  from local file storage to database.
+- Gemini 1.5 Flash integration: summary generated at audit creation time inside
+  `POST /api/audits`, saved directly to DB — no separate `/api/summary` route.
+- Lead capture modal: appears 2 seconds after audit results load (never before),
+  captures email, company, role, team size, and lead type for segmentation.
+- Resend email integration: sends transactional confirmation email on lead capture.
+- Abuse protection: honeypot field (`website`) — rejects submission silently if
+  filled. Chosen over rate limiting for zero false positives and simpler maintenance.
 
-**Why honeypot over rate limiting:**
-- Zero friction for real users (no false positives)
-- Effective against typical bot spam
-- Simple to implement and maintain
-- No IP/email-based blocking that could accidentally exclude legitimate users
+**Architecture decision — pre-generated summaries:**
+Generating the AI summary at audit creation and storing it means the results page
+fetches one row and renders instantly. The alternative (generating on page load)
+adds ~1–2s latency every time and burns API quota on repeat visits. Easy call.
 
-**What I learned:** Honeypot is a pragmatic first-line defense for lead forms. Rate limiting can come later if needed.
+**Bugs fixed:**
+- `GOOGLE_GEMINI_API_KEY` vs `GEMINI_API_KEY` mismatch in `src/lib/aiService.ts`.
+  Lesson: read `.env.local` before writing a new service file, not after.
+- Redundant summary generation: client was requesting a summary the initial audit
+  fetch already provided. Deleted the separate `/api/summary` route entirely.
 
-**Plan for tomorrow:** Shareable audit URLs with OG tags, UI polish, and deploy to Vercel.
+**What I learned:**
+Honeypot is a solid first-line defence for lead forms — no friction, no false
+positives, trivially simple. Rate limiting can layer on top later if bots get
+smarter. Pre-computing AI content server-side is almost always the right call for
+anything that hits a paid/rate-limited API.
 
-
-**What I learned:** The importance of "defensible" logic—savings recommendations need to be based on actual usage patterns, not just low prices. Also learned how to use the Node.js ESM test runner with --experimental-strip-types for faster logic verification without a heavy test framework.
-
-**Blockers / what I'm stuck on:** Ensuring the logic doesn't suggest "downgrading" to a plan that lacks a feature a user explicitly needs (e.g., SSO or Enterprise security). I'll need to refine the "reasoning" strings to mention these trade-offs.
-
-**Plan for tomorrow:** Integrate the Anthropic API for the personalized AI summary and set up Supabase for lead capture and report storage.
+**Plan for tomorrow:**
+Shareable audit URLs with OG tags, UI polish, deploy to Vercel.

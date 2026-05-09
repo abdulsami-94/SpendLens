@@ -47,6 +47,8 @@ export interface AuditResult {
   totalSavingsAnnual: number;
   showCredexCTA: boolean;
   isOptimal: boolean;
+  inputData: SpendFormData;
+  aiSummary?: string;
 }
 
 const CREDex_SAVINGS_THRESHOLD = 500;
@@ -86,6 +88,7 @@ export function runAudit(data: SpendFormData): AuditResult {
     totalSavingsAnnual: roundCurrency(totalSavingsMonthly * 12),
     showCredexCTA: totalSavingsMonthly >= CREDex_SAVINGS_THRESHOLD,
     isOptimal: totalSavingsMonthly <= OPTIMAL_SAVINGS_THRESHOLD,
+    inputData: data,
   };
 }
 
