@@ -22,6 +22,8 @@ export default function AuditResultsPage() {
   const router = useRouter();
   const [loadState, setLoadState] = useState<LoadState>({ status: "loading" });
   const [showLeadModal, setShowLeadModal] = useState(false);
+  const [summary, setSummary] = useState<string | null>(null);
+  const [summaryLoading, setSummaryLoading] = useState(false);
 
   useEffect(() => {
     let isMounted = true;
