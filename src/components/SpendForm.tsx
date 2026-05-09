@@ -38,6 +38,7 @@ export default function SpendForm({ onSubmit }: { onSubmit: (data: SpendFormData
     };
 
     const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+        console.log("handleSubmit triggered");
         event.preventDefault();
         onSubmit(formData);
     };

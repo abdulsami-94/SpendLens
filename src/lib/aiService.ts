@@ -2,7 +2,7 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 import type { AuditResult } from "./auditEngine";
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
-const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash-001" });
 
 export async function generateAuditSummary(result: AuditResult): Promise<string> {
   if (!process.env.GEMINI_API_KEY) {
@@ -33,8 +33,8 @@ export async function generateAuditSummary(result: AuditResult): Promise<string>
     const aiResult = await model.generateContent(prompt);
     const response = await aiResult.response;
     return response.text().trim();
-  } catch (error) {
-    console.error("Gemini AI generation failed:", error);
+  } catch (error: any) {
+    console.error("Gemini AI generation failed:", error.message, error.status);
     return "We've identified significant savings in your AI stack. Check the breakdown below to see how to optimize your monthly spend.";
   }
 }

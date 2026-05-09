@@ -1,4 +1,4 @@
-import { supabase } from "@/lib/supabase";
+import { supabaseAdmin as supabase } from "@/lib/supabase";
 import type { AuditResult } from "@/lib/auditEngine";
 
 export async function saveAuditResult(result: AuditResult): Promise<void> {

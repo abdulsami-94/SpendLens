@@ -9,6 +9,7 @@ export default function Home() {
   const router = useRouter();
 
   const handleAuditSubmit = async (data: SpendFormData) => {
+    console.log("handleAuditSubmit triggered with data:", data);
     const response = await fetch("/api/audits", {
       method: "POST",
       headers: {

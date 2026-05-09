@@ -80,7 +80,7 @@ export function runAudit(data: SpendFormData): AuditResult {
   );
 
   return {
-    id: crypto.randomUUID().slice(0, 8),
+    id: crypto.randomUUID(),
     recommendations,
     totalCurrentSpend,
     totalRecommendedSpend,
