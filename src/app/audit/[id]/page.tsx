@@ -3,14 +3,14 @@
 import CredexLeadForm from "@/components/CredexLeadForm";
 import NotifySignupForm from "@/components/NotifySignupForm";
 import LeadCaptureModal from "@/components/LeadCaptureModal";
-import type { AuditResult } from "@/lib/auditEngine";
+import type { PublicAuditResult } from "@/lib/auditStore.server";
 import { useParams, useRouter } from "next/navigation";
 import { startTransition, useEffect, useState } from "react";
 
 type LoadState =
   | { status: "loading" }
   | { status: "not-found" }
-  | { status: "ready"; result: AuditResult };
+  | { status: "ready"; result: PublicAuditResult };
 
 function formatCurrency(value: number): string {
   return `$${value.toFixed(2)}`;
@@ -43,7 +43,7 @@ export default function AuditResultsPage() {
           return;
         }
 
-        void response.json().then((result: AuditResult) => {
+        void response.json().then((result: PublicAuditResult) => {
           if (!isMounted) {
             return;
           }
@@ -216,7 +216,7 @@ export default function AuditResultsPage() {
                 </span>
               </div>
 
-              <div className="mt-5 grid gap-3 md:grid-cols-[repeat(4,minmax(0,1fr))]">
+              <div className="mt-5 grid gap-3 md:grid-cols-4">
                 <div className="rounded-2xl border border-zinc-200 bg-zinc-50 p-4">
                   <p className="text-xs font-semibold uppercase tracking-[0.18em] text-zinc-500">
                     Current spend

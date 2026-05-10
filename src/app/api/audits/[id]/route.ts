@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 
-import { getAuditResult } from "@/lib/auditStore.server";
+import { getAuditResult, sanitizeAuditResult } from "@/lib/auditStore.server";
 
 export async function GET(
   _request: Request,
@@ -16,5 +16,5 @@ export async function GET(
     );
   }
 
-  return NextResponse.json(result);
+  return NextResponse.json(sanitizeAuditResult(result));
 }

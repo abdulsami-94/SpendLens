@@ -1,6 +1,36 @@
 import { supabaseAdmin as supabase } from "@/lib/supabase";
 import type { AuditResult } from "@/lib/auditEngine";
 
+export type PublicAuditResult = Omit<AuditResult, "inputData">;
+
+const sensitiveKeys = new Set(["email", "company", "companyName"]);
+
+function stripSensitiveValues<T>(value: T): T {
+  if (Array.isArray(value)) {
+    return value.map((item) => stripSensitiveValues(item)) as unknown as T;
+  }
+
+  if (value && typeof value === "object") {
+    return Object.entries(value).reduce((acc, [key, entryValue]) => {
+      if (sensitiveKeys.has(key)) {
+        return acc;
+      }
+
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      acc[key as keyof typeof acc] = stripSensitiveValues(entryValue) as any;
+      return acc;
+    }, {} as Record<string, unknown>) as T;
+  }
+
+  return value;
+}
+
+export function sanitizeAuditResult(result: AuditResult): PublicAuditResult {
+  const cloned = JSON.parse(JSON.stringify(result)) as Record<string, unknown>;
+  delete cloned.inputData;
+  return stripSensitiveValues(cloned) as PublicAuditResult;
+}
+
 export async function saveAuditResult(result: AuditResult): Promise<void> {
   const { error } = await supabase
     .from("audits")
