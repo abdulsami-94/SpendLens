@@ -133,3 +133,28 @@ test("calculateTotalMonthlySpend sums monthly spend for all tools", () => {
 
   assert.equal(total, 150);
 });
+
+test("restoreSpendFormData computes monthlySpend from plan and seats when saved value is zero", () => {
+  const restored = restoreSpendFormData(
+    JSON.stringify({
+      teamSize: 5,
+      primaryUseCase: "coding",
+      tools: [
+        {
+          name: "GitHub Copilot",
+          plan: "Pro",
+          seats: 2,
+          monthlySpend: 0,
+        },
+      ],
+    })
+  );
+
+  const copilot = restored.tools.find((tool) => tool.name === "GitHub Copilot");
+  assert.deepEqual(copilot, {
+    name: "GitHub Copilot",
+    plan: "Pro",
+    seats: 2,
+    monthlySpend: 20,
+  });
+});

@@ -5,6 +5,7 @@ import {
     calculateTotalMonthlySpend,
     createInitialFormData,
     getToolPlans,
+    getToolMonthlySpend,
     restoreSpendFormData,
     SPEND_FORM_STORAGE_KEY,
     TOOLS_CONFIG,
@@ -34,10 +35,23 @@ export default function SpendForm({ onSubmit }: { onSubmit: (data: SpendFormData
     }, [formData]);
 
     const updateTool = (index: number, field: keyof ToolEntry, value: string | number) => {
-        const updatedTools = formData.tools.map((tool, i) => 
-        i === index ? {...tool, [field]: value } : tool
-        );
-        setFormData({...formData, tools: updatedTools});
+        const updatedTools = formData.tools.map((tool, i) => {
+            if (i !== index) {
+                return tool;
+            }
+
+            const updatedTool = {
+                ...tool,
+                [field]: value,
+            };
+
+            return {
+                ...updatedTool,
+                monthlySpend: getToolMonthlySpend(updatedTool),
+            };
+        });
+
+        setFormData({ ...formData, tools: updatedTools });
     };
 
     const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
@@ -91,7 +105,7 @@ export default function SpendForm({ onSubmit }: { onSubmit: (data: SpendFormData
                             return (
                                 <div
                                     key={tool.name}
-                                    className="grid gap-4 rounded-2xl border border-zinc-200 p-4 md:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)_120px] md:items-end"
+                                    className="grid gap-4 rounded-2xl border border-zinc-200 p-4 md:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)_minmax(0,1fr)] md:items-end"
                                 >
                                     <div>
                                         <p className="mt-1 text-base font-semibold text-zinc-950">{tool.name}</p>
@@ -122,7 +136,12 @@ export default function SpendForm({ onSubmit }: { onSubmit: (data: SpendFormData
                                             onChange={(e) => updateTool(index, "seats", Math.max(1, parseInt(e.target.value, 10) || 1))}
                                         />
                                     </label>
-
+                                    <div className="flex flex-col gap-2 text-sm font-medium text-zinc-800">
+                                        <span>Monthly spend</span>
+                                        <div className="rounded-xl border border-zinc-300 bg-zinc-50 px-4 py-3 text-base text-zinc-950">
+                                            ${getToolMonthlySpend(tool).toFixed(2)}
+                                        </div>
+                                    </div>
                                 </div>
                             );
                         })}
@@ -172,7 +191,11 @@ export default function SpendForm({ onSubmit }: { onSubmit: (data: SpendFormData
                                                     seats: 1,
                                                     monthlySpend: 0,
                                                 };
-                                                setFormData({ ...formData, tools: [...formData.tools, newTool] });
+                                                const pricedTool = {
+                                                    ...newTool,
+                                                    monthlySpend: getToolMonthlySpend(newTool),
+                                                };
+                                                setFormData({ ...formData, tools: [...formData.tools, pricedTool] });
                                                 setAddingTool(false);
                                                 setSelectedAddTool("");
                                             }}
