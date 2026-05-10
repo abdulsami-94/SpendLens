@@ -7,6 +7,7 @@ import {
     getToolPlans,
     restoreSpendFormData,
     SPEND_FORM_STORAGE_KEY,
+    TOOLS_CONFIG,
 } from "@/lib/spend-form-state.mjs";
 import { startTransition, useEffect, useRef, useState } from "react";
 
@@ -14,6 +15,8 @@ export default function SpendForm({ onSubmit }: { onSubmit: (data: SpendFormData
 
     const [formData, setFormData] = useState<SpendFormData>(() => createInitialFormData());
     const hasHydrated = useRef(false);
+    const [addingTool, setAddingTool] = useState(false);
+    const [selectedAddTool, setSelectedAddTool] = useState<string>("");
 
     useEffect(() => {
         startTransition(() => {
@@ -88,10 +91,9 @@ export default function SpendForm({ onSubmit }: { onSubmit: (data: SpendFormData
                             return (
                                 <div
                                     key={tool.name}
-                                    className="grid gap-4 rounded-2xl border border-zinc-200 p-4 md:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)_120px_160px] md:items-end"
+                                    className="grid gap-4 rounded-2xl border border-zinc-200 p-4 md:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)_120px] md:items-end"
                                 >
                                     <div>
-                                        <p className="text-sm font-medium text-zinc-500">Tool</p>
                                         <p className="mt-1 text-base font-semibold text-zinc-950">{tool.name}</p>
                                     </div>
                                     <label className="flex flex-col gap-2 text-sm font-medium text-zinc-800" htmlFor={`${toolId}-plan`}>
@@ -120,23 +122,76 @@ export default function SpendForm({ onSubmit }: { onSubmit: (data: SpendFormData
                                             onChange={(e) => updateTool(index, "seats", Math.max(1, parseInt(e.target.value, 10) || 1))}
                                         />
                                     </label>
-                                    <label className="flex flex-col gap-2 text-sm font-medium text-zinc-800" htmlFor={`${toolId}-monthly-spend`}>
-                                        Total Tool Spend ($)
-                                        <input
-                                            id={`${toolId}-monthly-spend`}
-                                            className="rounded-xl border border-zinc-300 px-4 py-3 text-base text-zinc-950 outline-none transition focus:border-zinc-500"
-                                            type="number"
-                                            min="0"
-                                            step="0.01"
-                                            value={tool.monthlySpend}
-                                            onChange={(e) => updateTool(index, "monthlySpend", Math.max(0, parseFloat(e.target.value) || 0))}
-                                        />
-                                    </label>
+
                                 </div>
                             );
                         })}
                     </div>
                 </fieldset>
+
+                <div className="mt-4">
+                    {(() => {
+                        const availableTools = TOOLS_CONFIG.map((t) => t.name).filter((n) => !formData.tools.some((ft) => ft.name === n));
+                        if (availableTools.length === 0) {
+                            return null;
+                        }
+
+                        return (
+                            <div className="flex items-center gap-3">
+                                {!addingTool ? (
+                                    <button
+                                        type="button"
+                                        className="rounded-full border border-zinc-200 px-4 py-2 text-sm font-medium text-zinc-700"
+                                        onClick={() => {
+                                            setAddingTool(true);
+                                            setSelectedAddTool(availableTools[0]);
+                                        }}
+                                    >
+                                        + Add Tool
+                                    </button>
+                                ) : (
+                                    <div className="flex items-center gap-2">
+                                        <select
+                                            className="rounded-xl border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-950 outline-none"
+                                            value={selectedAddTool}
+                                            onChange={(e) => setSelectedAddTool(e.target.value)}
+                                        >
+                                            {availableTools.map((name) => (
+                                                <option key={name} value={name}>{name}</option>
+                                            ))}
+                                        </select>
+                                        <button
+                                            type="button"
+                                            className="rounded-full bg-zinc-950 px-4 py-2 text-sm font-medium text-white"
+                                            onClick={() => {
+                                                if (!selectedAddTool) return;
+                                                const plans = getToolPlans(selectedAddTool);
+                                                const newTool = {
+                                                    name: selectedAddTool,
+                                                    plan: plans[0] ?? "Unknown",
+                                                    seats: 1,
+                                                    monthlySpend: 0,
+                                                };
+                                                setFormData({ ...formData, tools: [...formData.tools, newTool] });
+                                                setAddingTool(false);
+                                                setSelectedAddTool("");
+                                            }}
+                                        >
+                                            Add
+                                        </button>
+                                        <button
+                                            type="button"
+                                            className="text-sm text-zinc-500"
+                                            onClick={() => { setAddingTool(false); setSelectedAddTool(""); }}
+                                        >
+                                            Cancel
+                                        </button>
+                                    </div>
+                                )}
+                            </div>
+                        );
+                    })()}
+                </div>
 
                 <div className="flex flex-col gap-4 rounded-2xl border border-zinc-200 bg-zinc-50 p-5 sm:flex-row sm:items-center sm:justify-between">
                     <div>

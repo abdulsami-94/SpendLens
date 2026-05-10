@@ -32,13 +32,19 @@ export function getToolPlans(toolName) {
 
 /** @returns {SpendFormData} */
 export function createInitialFormData() {
-  return {
-    tools: TOOLS_CONFIG.map((tool) => ({
+  const defaultNames = ["Cursor", "GitHub Copilot", "Claude"];
+  const defaultTools = defaultNames
+    .map((name) => TOOLS_CONFIG.find((t) => t.name === name))
+    .filter(Boolean)
+    .map((tool) => ({
       name: tool.name,
       plan: tool.plans[0] ?? "Unknown",
       seats: 1,
       monthlySpend: 0,
-    })),
+    }));
+
+  return {
+    tools: defaultTools,
     teamSize: 1,
     primaryUseCase: "coding",
   };
@@ -59,28 +65,39 @@ export function restoreSpendFormData(rawValue) {
 
   try {
     const parsed = JSON.parse(rawValue);
-    const storedTools = Array.isArray(parsed?.tools) ? parsed.tools : [];
+    const storedTools = Array.isArray(parsed?.tools) ? parsed.tools : null;
 
-    return {
-      teamSize: toPositiveInteger(parsed?.teamSize, fallback.teamSize),
-      primaryUseCase: PRIMARY_USE_CASES.has(parsed?.primaryUseCase)
-        ? parsed.primaryUseCase
-        : fallback.primaryUseCase,
-      tools: TOOLS_CONFIG.map((tool) => {
-        const storedTool = storedTools.find(
-          (entry) => entry?.name === tool.name
-        );
+    if (storedTools && storedTools.length > 0) {
+      // Validate stored tools against TOOLS_CONFIG and normalize
+      const validToolNames = TOOLS_CONFIG.map((t) => t.name);
+      const tools = storedTools
+        .filter((entry) => validToolNames.includes(entry?.name))
+        .map((storedTool) => {
+          const catalogTool = TOOLS_CONFIG.find((t) => t.name === storedTool.name);
+          return {
+            name: storedTool.name,
+            plan:
+              catalogTool && catalogTool.plans.includes(storedTool?.plan)
+                ? storedTool.plan
+                : catalogTool?.plans[0] ?? "Unknown",
+            seats: toPositiveInteger(storedTool?.seats, 1),
+            monthlySpend: toNonNegativeNumber(storedTool?.monthlySpend, 0),
+          };
+        });
 
-        return {
-          name: tool.name,
-          plan: tool.plans.includes(storedTool?.plan)
-            ? storedTool.plan
-            : tool.plans[0] ?? "Unknown",
-          seats: toPositiveInteger(storedTool?.seats, 1),
-          monthlySpend: toNonNegativeNumber(storedTool?.monthlySpend, 0),
-        };
-      }),
-    };
+      // If no valid stored tools found, fall back
+      return tools.length > 0
+        ? {
+            teamSize: toPositiveInteger(parsed?.teamSize, fallback.teamSize),
+            primaryUseCase: PRIMARY_USE_CASES.has(parsed?.primaryUseCase)
+              ? parsed.primaryUseCase
+              : fallback.primaryUseCase,
+            tools,
+          }
+        : fallback;
+    }
+
+    return fallback;
   } catch {
     return fallback;
   }
