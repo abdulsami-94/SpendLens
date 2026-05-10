@@ -6,6 +6,7 @@ import LeadCaptureModal from "@/components/LeadCaptureModal";
 import type { PublicAuditResult } from "@/lib/auditStore.server";
 import { useParams, useRouter } from "next/navigation";
 import { startTransition, useEffect, useState } from "react";
+import { ArrowLeft } from "lucide-react";
 
 type LoadState =
   | { status: "loading" }
@@ -14,6 +15,15 @@ type LoadState =
 
 function formatCurrency(value: number): string {
   return `$${value.toFixed(2)}`;
+}
+
+function formatAuditDate(dateString: string): string {
+  const date = new Date(dateString);
+  return date.toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
 }
 
 export default function AuditResultsPage() {
@@ -111,7 +121,7 @@ export default function AuditResultsPage() {
           <div className="flex flex-col items-start justify-between gap-6 sm:flex-row sm:items-center">
             <div>
               <h1 className="text-4xl font-bold tracking-tight">Your AI Audit</h1>
-              <p className="mt-2 text-zinc-400">Audit ID: {auditId}</p>
+              <p className="mt-2 text-zinc-400">Audited on {formatAuditDate(result.createdAt)}</p>
             </div>
             <div className="text-left sm:text-right">
               <p className="text-sm font-medium uppercase tracking-wider text-emerald-400">
@@ -155,7 +165,7 @@ export default function AuditResultsPage() {
           </div>
         )}
 
-        <div className="mt-8 rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm">
+        <div className="mt-8 rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm ring-1 ring-inset ring-zinc-900/5">
           {result.aiSummary && (
             <div className="mb-8 rounded-2xl border border-blue-100 bg-blue-50 p-6">
               <div className="flex items-center gap-2">
@@ -196,7 +206,7 @@ export default function AuditResultsPage() {
         </div>
 
         <div className="mt-12 space-y-6">
-          <h2 className="text-2xl font-bold text-zinc-950">Per-Tool Audit Chain</h2>
+          <h2 className="text-2xl font-bold text-zinc-950">Tool-by-Tool Breakdown</h2>
           {result.recommendations.map((recommendation) => (
             <div
               key={recommendation.toolName}
@@ -295,9 +305,10 @@ export default function AuditResultsPage() {
           <button
             type="button"
             onClick={() => router.push("/")}
-            className="text-sm font-medium text-zinc-500 underline underline-offset-4 transition hover:text-zinc-950"
+            className="inline-flex items-center gap-2 text-sm font-medium text-zinc-500 transition hover:text-zinc-950 hover:underline underline-offset-4"
           >
-            {"<-"} Edit your data
+            <ArrowLeft className="h-4 w-4" />
+            Edit your data
           </button>
         </div>
       </div>

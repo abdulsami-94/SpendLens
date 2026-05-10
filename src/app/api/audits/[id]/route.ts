@@ -16,5 +16,6 @@ export async function GET(
     );
   }
 
-  return NextResponse.json(sanitizeAuditResult(result));
+  const sanitized = sanitizeAuditResult(result as any);
+  return NextResponse.json({ ...sanitized, createdAt: result.createdAt });
 }

@@ -1,7 +1,9 @@
 import { supabaseAdmin as supabase } from "@/lib/supabase";
 import type { AuditResult } from "@/lib/auditEngine";
 
-export type PublicAuditResult = Omit<AuditResult, "inputData">;
+export type PublicAuditResult = Omit<AuditResult, "inputData"> & {
+  createdAt: string;
+};
 
 const sensitiveKeys = new Set(["email", "company", "companyName"]);
 
@@ -46,10 +48,10 @@ export async function saveAuditResult(result: AuditResult): Promise<void> {
   }
 }
 
-export async function getAuditResult(id: string): Promise<AuditResult | null> {
+export async function getAuditResult(id: string): Promise<(AuditResult & { createdAt: string }) | null> {
   const { data, error } = await supabase
     .from("audits")
-    .select("results")
+    .select("results, created_at")
     .eq("id", id)
     .single();
 
@@ -61,5 +63,5 @@ export async function getAuditResult(id: string): Promise<AuditResult | null> {
     throw new Error("Failed to fetch audit result from Supabase");
   }
 
-  return data.results as AuditResult;
+  return { ...(data.results as AuditResult), createdAt: data.created_at };
 }
