@@ -1,12 +1,16 @@
 "use client";
 
-import CredexLeadForm from "@/components/CredexLeadForm";
-import NotifySignupForm from "@/components/NotifySignupForm";
-import LeadCaptureModal from "@/components/LeadCaptureModal";
+import dynamic from "next/dynamic";
 import type { PublicAuditResult } from "@/lib/auditStore.server";
 import { useParams, useRouter } from "next/navigation";
 import { startTransition, useEffect, useState } from "react";
 import { ArrowLeft } from "lucide-react";
+
+const CredexLeadForm = dynamic(() => import("@/components/CredexLeadForm"));
+const NotifySignupForm = dynamic(() => import("@/components/NotifySignupForm"));
+const LeadCaptureModal = dynamic(() => import("@/components/LeadCaptureModal"), {
+  loading: () => null,
+});
 
 type LoadState =
   | { status: "loading" }
@@ -26,93 +30,24 @@ function formatAuditDate(dateString: string): string {
   });
 }
 
-export default function AuditResultsPage() {
+export default function AuditResultsPage({ initialData }: { initialData: PublicAuditResult }) {
   const params = useParams<{ id: string }>();
   const auditId = Array.isArray(params.id) ? params.id[0] : params.id;
   const router = useRouter();
-  const [loadState, setLoadState] = useState<LoadState>({ status: "loading" });
   const [showLeadModal, setShowLeadModal] = useState(false);
-  const [summary, setSummary] = useState<string | null>(null);
-  const [summaryLoading, setSummaryLoading] = useState(false);
 
   useEffect(() => {
-    let isMounted = true;
-
-    async function loadAuditResult() {
-      const response = await fetch(`/api/audits/${auditId}`, {
-        cache: "no-store",
-      });
-
-      if (!isMounted) {
-        return;
-      }
-
-      startTransition(() => {
-        if (!response.ok) {
-          setLoadState({ status: "not-found" });
-          return;
-        }
-
-        void response.json().then((result: PublicAuditResult) => {
-          if (!isMounted) {
-            return;
-          }
-
-          startTransition(() => {
-            setLoadState({ status: "ready", result });
-            
-            // Show lead modal after a short delay
-            setTimeout(() => {
-              setShowLeadModal(true);
-            }, 2000);
-          });
-        });
-      });
-    }
-
-    void loadAuditResult();
-
+    // Load lead modal on next frame to avoid blocking render
+    const idleId = requestIdleCallback(() => {
+      setShowLeadModal(true);
+    }, { timeout: 3000 });
+    
     return () => {
-      isMounted = false;
+      cancelIdleCallback(idleId);
     };
-  }, [auditId]);
+  }, []);
 
-  if (loadState.status === "loading") {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-zinc-50">
-        <p className="text-zinc-500">Loading audit results...</p>
-      </div>
-    );
-  }
-
-  if (loadState.status === "not-found") {
-    return (
-      <main className="min-h-screen bg-zinc-50 px-6 py-12 sm:px-10">
-        <div className="mx-auto max-w-2xl rounded-3xl border border-zinc-200 bg-white p-8 text-center shadow-sm sm:p-12">
-          <p className="text-sm font-medium uppercase tracking-[0.2em] text-zinc-500">
-            Audit not found
-          </p>
-          <h1 className="mt-4 text-3xl font-semibold tracking-tight text-zinc-950">
-            We could not find audit {auditId}.
-          </h1>
-          <p className="mt-3 text-zinc-600">
-            Audit results now come from durable app storage instead of browser-only
-            local storage. If this ID came from an older browser-only run, generate a
-            fresh audit from the home page.
-          </p>
-          <button
-            className="mt-8 rounded-full bg-zinc-950 px-6 py-3 text-sm font-medium text-white transition hover:bg-zinc-800"
-            type="button"
-            onClick={() => router.push("/")}
-          >
-            Create a new audit
-          </button>
-        </div>
-      </main>
-    );
-  }
-
-  const { result } = loadState;
+  const result = initialData;
 
   return (
     <main className="min-h-screen bg-zinc-50 px-6 py-12 sm:px-10">
@@ -151,19 +86,6 @@ export default function AuditResultsPage() {
             </div>
           </div>
         </div>
-
-        {summary && (
-          <div className="mt-8 rounded-2xl border border-blue-200 bg-blue-50 p-6 shadow-sm">
-            <h2 className="text-lg font-bold text-blue-950">AI Summary</h2>
-            <p className="mt-3 text-blue-900">{summary}</p>
-          </div>
-        )}
-
-        {summaryLoading && (
-          <div className="mt-8 rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm">
-            <p className="text-zinc-500">Generating personalized summary...</p>
-          </div>
-        )}
 
         <div className="mt-8 rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm ring-1 ring-inset ring-zinc-900/5">
           {result.aiSummary && (

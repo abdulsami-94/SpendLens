@@ -42,11 +42,13 @@ there's no fixed plan pricing.
 rules for all 8 tools, research official pricing pages, populate 
 PRICING_DATA.md with source URLs.
 
+
 ## Day 3 — 2026-05-08
 
 **Hours worked:** 5
 
 **What I did:** Finalized the core Audit Engine logic. Implemented vendor-specific rules for all 8 tools and integrated annual billing discounts (20%). Added "Consolidation Heuristics" to detect redundant tools (e.g., Cursor vs. Copilot). Built the Results Page UI, making Monthly Savings the primary hero metric. Verified and documented all pricing sources in PRICING_DATA.md. Set up a basic test suite using Node.js experimental TypeScript support.
+
 
 ## Day 4 — 2026-05-09
 
@@ -82,3 +84,57 @@ anything that hits a paid/rate-limited API.
 
 **Plan for tomorrow:**
 Shareable audit URLs with OG tags, UI polish, deploy to Vercel.
+
+
+## Day 5 — 2026-05-10
+
+**Hours worked:** 6
+
+**What I did:**
+- Added public `/audit/[id]` route — strips email and company name, 
+  shows tools, recommendations, and savings numbers publicly
+- Added Open Graph and Twitter Card meta tags to the audit results page
+  using Next.js `generateMetadata()` — dynamic title includes savings amount,
+  description pulls top recommendation, fallback metadata handles missing audits
+- Split audit page into server component (page.tsx) and client component
+  (AuditResultsClient.tsx) to support server-side metadata generation
+- Added static `og-default.png` placeholder at 1200×630px
+- Fixed the $0 savings bug — root cause was `monthlySpend` staying 0 on all
+  tool entries because plan/seat changes were not recalculating spend.
+  Added `getToolMonthlySpend()` to derive pricing from `pricingCatalog.ts`,
+  updated `updateTool()` in SpendForm.tsx to recalculate on every change
+- UI polish on results page:
+  - Replaced raw UUID with "Audited on [date]" using `createdAt` timestamp
+  - Renamed "Per-Tool Audit Chain" to "Tool-by-Tool Breakdown"
+  - Replaced `<-` text with lucide-react `ArrowLeft` icon, styled properly
+  - Fixed executive summary section border to feel connected to page design
+- Refactored spend form:
+  - Removed redundant "Tool" label above each tool name
+  - Removed per-tool "Total Tool Spend" column
+  - Default to 3 tools (Cursor, GitHub Copilot, Claude)
+  - Added "+ Add Tool" button with dropdown excluding already-added tools
+- Deployed to Vercel — live at https://spend-lens-six.vercel.app/
+- Ran Lighthouse on live URL: Performance 83, Accessibility 96, 
+  Best Practices 100, SEO 100
+- Performance is 1 point below the 85 threshold — fix in progress
+
+**What I learned:**
+- Next.js App Router requires server components for `generateMetadata()` —
+  you can't generate metadata in a client component, so pages with both
+  interactivity and OG tags need to be split into two files
+- localStorage returning undefined means the save handler wasn't writing
+  anything — always test the save path first before debugging the read path
+- Vercel build failures with passing local builds almost always mean missing
+  environment variables on the Vercel dashboard
+
+**Blockers / what I'm stuck on:**
+- Lighthouse performance sitting at 83 — TBT 230ms and Speed Index 7.3s
+  are the main offenders, working on lazy loading and render-blocking fixes
+
+**Plan for tomorrow:**
+- Fix Lighthouse performance to 85+, redeploy
+- Write minimum 5 audit engine tests with Jest/Vitest
+- Set up GitHub Actions CI workflow
+- Write GTM.md, ECONOMICS.md, LANDING_COPY.md, METRICS.md
+- Flesh out REFLECTION.md and ARCHITECTURE.md
+- Do 3 user interviews or document existing ones in USER_INTERVIEWS.md

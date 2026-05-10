@@ -1,6 +1,19 @@
 "use client";
 
-import SpendForm from "@/components/SpendForm";
+import dynamic from "next/dynamic";
+const SpendForm = dynamic(() => import("@/components/SpendForm"), {
+  ssr: true,
+  loading: () => (
+    <div className="h-[600px] w-full animate-pulse rounded-3xl border border-zinc-200 bg-white p-8">
+      <div className="h-8 w-1/3 rounded bg-zinc-100" />
+      <div className="mt-2 h-4 w-2/3 rounded bg-zinc-50" />
+      <div className="mt-12 space-y-6">
+        <div className="h-20 w-full rounded-2xl bg-zinc-50" />
+        <div className="h-20 w-full rounded-2xl bg-zinc-50" />
+      </div>
+    </div>
+  ),
+});
 import type { SpendFormData } from "@/types";
 import { useRouter } from "next/navigation";
 import { startTransition } from "react";

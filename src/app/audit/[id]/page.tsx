@@ -21,7 +21,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
           title: "AI Spend Audit - Not Found",
           description: "The requested audit could not be found.",
           type: "website",
-          images: [{ url: "/og-default.png" }],
+          images: [{ url: "/og-default.png", width: 1200, height: 630 }],
         },
         twitter: {
           card: "summary_large_image",
@@ -54,7 +54,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
         description,
         url,
         type: "website",
-        images: [{ url: "/og-default.png" }],
+        images: [{ url: "/og-default.png", width: 1200, height: 630 }],
       },
       twitter: {
         card: "summary_large_image",
@@ -72,7 +72,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
         title: "AI Spend Audit",
         description: "Analyze your AI tool spending and find savings opportunities.",
         type: "website",
-        images: [{ url: "/og-default.png" }],
+        images: [{ url: "/og-default.png", width: 1200, height: 630 }],
       },
       twitter: {
         card: "summary_large_image",
@@ -93,5 +93,7 @@ export default async function AuditResultsPage({ params }: PageProps) {
     notFound();
   }
 
-  return <AuditResultsClient />;
-}
+  const sanitizedResult = sanitizeAuditResult(result);
+
+  return <AuditResultsClient initialData={sanitizedResult} />;
+  }
