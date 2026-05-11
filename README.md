@@ -2,17 +2,16 @@
 
 **SpendLens is a free AI spend auditor for engineering teams.** You enter your AI tools, plans, and seat counts — it tells you exactly how much you're wasting and what to switch to, with specific recommendations backed by official pricing data. Built for engineering managers and CTOs who are paying for multiple AI tools and have no clear picture of whether the spend is optimised.
 
-🔗 **Live:** https://spend-lens-six.vercel.app/
+ **Live:** https://spend-lens-six.vercel.app/
 
 ---
 
 ## Screenshots
 
-> _Add 3 screenshots or a Loom link here before submitting._
 
 | Spend Form | Audit Results | Lead Capture |
 |------------|---------------|--------------|
-| ![Form](./Imgs/screenshot-form.png) | ![Results](./Imgs/screenshot-results.png) | ![Lead](./Imgs/screenshot-lead.png) |
+| ![Form](/assets/Tool.png) | ![Results](/assets/Result.png) | ![Lead](/assets/LC.png) |
 
 ---
 
@@ -37,7 +36,8 @@ Create a `.env.local` file in the root:
 ```env
 NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
-ANTHROPIC_API_KEY=your_anthropic_api_key
+SUPABASE_SERVICE_ROLE_KEY=your_supabase_service_key
+GEMINI_API_KEY=your_gemini_api_key
 RESEND_API_KEY=your_resend_api_key
 ```
 
@@ -76,13 +76,13 @@ Node 22 ships with `node:test` and supports TypeScript via `--experimental-strip
 Every price in `pricingCatalog.ts` is hardcoded, sourced from official pricing pages, and timestamped. The alternative — scraping vendor pages at runtime — would make the audit engine dependent on external uptime and HTML structure that changes without warning. Hardcoded data is reliable and auditable. The trade-off is manual maintenance when vendors update pricing, which is mitigated by the source URLs and verification dates on every entry.
 
 ### 3. Pre-generated AI summary over on-demand generation
-The Anthropic API summary is generated once when the audit is created and stored in Supabase alongside the result. The alternative — generating it on every page load — adds 1–2 seconds of latency on each visit and burns API quota on repeat views of the same audit. Pre-generation means the results page renders instantly from a single database fetch. The trade-off is that the summary can't be regenerated if the prompt improves without re-running the audit.
+The Gemini API summary is generated once when the audit is created and stored in Supabase alongside the result. The alternative — generating it on every page load — adds 1–2 seconds of latency on each visit and burns API quota on repeat views of the same audit. Pre-generation means the results page renders instantly from a single database fetch. The trade-off is that the summary can't be regenerated if the prompt improves without re-running the audit.
 
 ### 4. Honeypot field over rate limiting for abuse protection
 The lead capture form uses a hidden `website` field — if it's filled, the submission is silently rejected. Rate limiting was the alternative, but it adds infrastructure complexity (Redis or an in-memory store) and risks false positives on legitimate users behind shared IPs. Honeypots catch unsophisticated bots with zero friction and zero false positives. The trade-off is that a targeted bot that reads the HTML will bypass it — rate limiting can layer on top if that becomes a real problem.
 
 ### 5. Automatic spend calculation over free-text input
-Originally, users could type their monthly spend directly. This was changed so that spend is calculated automatically from the selected plan and seat count using official pricing data. Free-text input produced audit results that were meaningless — if a user typed an arbitrary number, there was no valid baseline to compare recommendations against. Automatic calculation ensures every audit starts from accurate, comparable data. The trade-off is that users with negotiated enterprise rates can't enter their actual invoice amount.
+Originally, users could type their monthly spend directly. This was changed so that spend is calculated automatically from the selected plan and seat count using official pricing data. Free-text input produced audit results that were meaningless — if a user typed an arbitrary number, there was no valid baseline to compare recommendations against. Gemini calculation ensures every audit starts from accurate, comparable data. The trade-off is that users with negotiated enterprise rates can't enter their actual invoice amount.
 
 ---
 
@@ -92,7 +92,7 @@ Originally, users could type their monthly spend directly. This was changed so t
 - **Language:** TypeScript
 - **Styling:** Tailwind CSS v4
 - **Database:** Supabase (PostgreSQL)
-- **AI:** Anthropic API (Claude Sonnet 4)
+- **AI:** Gemini API
 - **Email:** Resend
 - **Deployment:** Vercel
 - **CI:** GitHub Actions
