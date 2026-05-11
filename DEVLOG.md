@@ -231,3 +231,49 @@ Shareable audit URLs with OG tags, UI polish, deploy to Vercel.
 - Final submission check: run git log date count, verify deployed URL,
   confirm all markdown files exist at Logs/
 - Fill in Google Form with repo URL, live URL, markdown confirmation
+
+
+## Day 7 — 2026-05-12
+
+**Hours worked:** 4
+
+**What I did:**
+- Added landing page matching CampusSync-style layout — hero headline,
+  subheadline, dual CTA buttons, scroll indicator
+- Refactored spend input form to show 3 tools by default with
+  "+ Add Tool" reveal — reduces visual overwhelm on cold load
+- Fixed tool card alignment issue — left side (name + spend) and right
+  side (plan + seats) were not vertically centered, fixed with flexbox
+  items-center
+- Reduced tool card padding from oversized to py-3/py-4 for a denser,
+  more readable layout
+- Added Open Graph and Twitter Card meta tags to app/layout.tsx —
+  title, description, og:image all set with deployed URL
+- Created og-default.png (1200x630) and placed in /public for social
+  previews
+- Updated ARCHITECTURE.md — corrected Anthropic/Claude references to
+  Gemini API throughout the Mermaid diagram
+- Ran Lighthouse audit — Performance at 83, working on closing gap to 85
+  via lazy loading optimizations
+
+**Bugs fixed:**
+- Detached HEAD state from earlier in the week — commit was floating off
+  main, fixed with git checkout main && git merge [hash]
+- OG image placeholder was 21 bytes (empty file) — replaced with actual
+  1200x630 PNG
+
+**What I learned:**
+- Detached HEAD doesn't mean lost commits — the hash is still reachable,
+  just not on any branch. git merge saves it cleanly
+- Twitter card validator is unreliable — opengraph.xyz is the better
+  tool for testing social previews
+- git push showing "Everything up-to-date" can be misleading when you're
+  in detached HEAD — it pushed main, silently ignored your new commit
+
+**Blockers / what I'm stuck on:**
+- USER_INTERVIEWS.md still needs 3 real conversations — reaching out
+  today
+
+**Plan for tomorrow:**
+- Final submission: verify git log shows commits on 5+ distinct days,
+  confirm all markdown files at repo root, submit Google Form
