@@ -127,9 +127,9 @@ export default function Home() {
           </div>
 
           {/* Scroll Indicator */}
-          <div className="absolute bottom-12 left-1/2 -translate-x-1/2 animate-bounce">
-            <ChevronDown size={32} className="text-zinc-300" />
-          </div>
+          <a href="#audit" className="absolute bottom-12 left-1/2 -translate-x-1/2 animate-bounce p-2 text-zinc-300 hover:text-zinc-500 transition-colors" aria-label="Scroll to audit">
+            <ChevronDown size={32} />
+          </a>
         </section>
 
         {/* Audit Section */}

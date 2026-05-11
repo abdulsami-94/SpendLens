@@ -136,41 +136,48 @@ export default function SpendForm({ onSubmit }: { onSubmit: (data: SpendFormData
                             return (
                                 <div
                                     key={tool.name}
-                                    className="grid gap-4 rounded-2xl border border-zinc-200 p-4 md:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)_minmax(0,1fr)] md:items-end animate-in fade-in slide-in-from-top-2 duration-300"
+                                    className="flex flex-col md:flex-row md:items-center justify-between gap-4 rounded-xl border border-zinc-200 px-4 py-3 animate-in fade-in slide-in-from-top-2 duration-300"
                                 >
-                                    <div>
-                                        <p className="mt-1 text-base font-semibold text-zinc-950">{tool.name}</p>
+                                    {/* Left Side: Name and Spend */}
+                                    <div className="flex flex-col">
+                                        <p className="text-base font-semibold text-zinc-950">{tool.name}</p>
+                                        <p className="text-sm font-medium text-zinc-500">
+                                            ${getToolMonthlySpend(tool).toFixed(2)} /mo
+                                        </p>
                                     </div>
-                                    <label className="flex flex-col gap-2 text-sm font-medium text-zinc-800" htmlFor={`${toolId}-plan`}>
-                                        Plan
-                                        <select
-                                            id={`${toolId}-plan`}
-                                            className="rounded-xl border border-zinc-300 bg-white px-4 py-3 text-base text-zinc-950 outline-none transition focus:border-zinc-500"
-                                            value={tool.plan}
-                                            onChange={(e) => updateTool(index, "plan", e.target.value)}
-                                        >
-                                            {plans.map((plan) => (
-                                                <option key={plan} value={plan}>
-                                                    {plan}
-                                                </option>
-                                            ))}
-                                        </select>
-                                    </label>
-                                    <label className="flex flex-col gap-2 text-sm font-medium text-zinc-800" htmlFor={`${toolId}-seats`}>
-                                        Seats
-                                        <input
-                                            id={`${toolId}-seats`}
-                                            className="rounded-xl border border-zinc-300 px-4 py-3 text-base text-zinc-950 outline-none transition focus:border-zinc-500"
-                                            type="number"
-                                            min="1"
-                                            value={tool.seats}
-                                            onChange={(e) => updateTool(index, "seats", Math.max(1, parseInt(e.target.value, 10) || 1))}
-                                        />
-                                    </label>
-                                    <div className="flex flex-col gap-2 text-sm font-medium text-zinc-800">
-                                        <span>Monthly spend</span>
-                                        <div className="rounded-xl border border-zinc-300 bg-zinc-50 px-4 py-3 text-base text-zinc-950">
-                                            ${getToolMonthlySpend(tool).toFixed(2)}
+
+                                    {/* Right Side: Inputs */}
+                                    <div className="flex flex-col sm:flex-row items-center gap-4">
+                                        <div className="flex items-center gap-2">
+                                            <label className="text-xs font-semibold uppercase tracking-wider text-zinc-400" htmlFor={`${toolId}-plan`}>
+                                                Plan
+                                            </label>
+                                            <select
+                                                id={`${toolId}-plan`}
+                                                className="rounded-lg border border-zinc-200 bg-white px-3 py-1.5 text-sm text-zinc-950 outline-none transition focus:border-zinc-400"
+                                                value={tool.plan}
+                                                onChange={(e) => updateTool(index, "plan", e.target.value)}
+                                            >
+                                                {plans.map((plan) => (
+                                                    <option key={plan} value={plan}>
+                                                        {plan}
+                                                    </option>
+                                                ))}
+                                            </select>
+                                        </div>
+
+                                        <div className="flex items-center gap-2">
+                                            <label className="text-xs font-semibold uppercase tracking-wider text-zinc-400" htmlFor={`${toolId}-seats`}>
+                                                Seats
+                                            </label>
+                                            <input
+                                                id={`${toolId}-seats`}
+                                                className="w-20 rounded-lg border border-zinc-200 px-3 py-1.5 text-sm text-zinc-950 outline-none transition focus:border-zinc-400"
+                                                type="number"
+                                                min="1"
+                                                value={tool.seats}
+                                                onChange={(e) => updateTool(index, "seats", Math.max(1, parseInt(e.target.value, 10) || 1))}
+                                            />
                                         </div>
                                     </div>
                                 </div>
