@@ -149,7 +149,7 @@ export default function SpendForm({ onSubmit }: { onSubmit: (data: SpendFormData
                                     {/* Right Side: Inputs */}
                                     <div className="flex flex-col sm:flex-row items-center gap-4">
                                         <div className="flex items-center gap-2">
-                                            <label className="text-xs font-semibold uppercase tracking-wider text-zinc-400" htmlFor={`${toolId}-plan`}>
+                                            <label className="text-xs font-semibold uppercase tracking-wider text-zinc-600" htmlFor={`${toolId}-plan`}>
                                                 Plan
                                             </label>
                                             <select
@@ -167,7 +167,7 @@ export default function SpendForm({ onSubmit }: { onSubmit: (data: SpendFormData
                                         </div>
 
                                         <div className="flex items-center gap-2">
-                                            <label className="text-xs font-semibold uppercase tracking-wider text-zinc-400" htmlFor={`${toolId}-seats`}>
+                                            <label className="text-xs font-semibold uppercase tracking-wider text-zinc-600" htmlFor={`${toolId}-seats`}>
                                                 Seats
                                             </label>
                                             <input
@@ -212,7 +212,7 @@ export default function SpendForm({ onSubmit }: { onSubmit: (data: SpendFormData
                                     ))}
                                     <button
                                         type="button"
-                                        className="ml-2 text-sm text-zinc-400 hover:text-zinc-600 underline"
+                                        className="ml-2 text-sm text-zinc-600 hover:text-zinc-600 underline"
                                         onClick={() => setIsAdding(false)}
                                     >
                                         Cancel

@@ -90,7 +90,11 @@ export default function Home() {
           </div>
 
           {/* Mobile Menu Toggle */}
-          <button className="md:hidden p-2 text-zinc-600" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
+          <button 
+            className="md:hidden p-2 text-zinc-600" 
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
+          >
             {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
           </button>
         </div>
@@ -127,7 +131,7 @@ export default function Home() {
           </div>
 
           {/* Scroll Indicator */}
-          <a href="#audit" className="absolute bottom-12 left-1/2 -translate-x-1/2 animate-bounce p-2 text-zinc-300 hover:text-zinc-500 transition-colors" aria-label="Scroll to audit">
+          <a href="#audit" className="absolute bottom-12 left-1/2 -translate-x-1/2 animate-bounce p-2 text-zinc-500 hover:text-zinc-700 transition-colors" aria-label="Scroll to audit">
             <ChevronDown size={32} />
           </a>
         </section>
@@ -143,23 +147,29 @@ export default function Home() {
           </div>
         </section>
 
-        {/* How it Works / Features Placeholder Sections to fulfill Nav links */}
+        {/* How it Works Section */}
         <section id="how-it-works" className="py-24 px-6">
-          <div className="max-w-6xl mx-auto grid md:grid-cols-3 gap-12">
-            <div>
-              <div className="w-12 h-12 bg-blue-100 text-blue-600 rounded-xl flex items-center justify-center mb-6 text-xl font-bold">1</div>
-              <h3 className="text-xl font-bold mb-3">Connect your tools</h3>
-              <p className="text-zinc-500">List all the AI subscriptions your team is currently paying for across engineering and product.</p>
+          <div className="max-w-6xl mx-auto">
+            <div className="text-center mb-16">
+              <h2 className={`${playfair.className} text-4xl font-bold mb-4`}>How it works</h2>
+              <p className="text-zinc-500 max-w-xl mx-auto">Three simple steps to optimize your AI tool spend.</p>
             </div>
-            <div>
-              <div className="w-12 h-12 bg-blue-100 text-blue-600 rounded-xl flex items-center justify-center mb-6 text-xl font-bold">2</div>
-              <h3 className="text-xl font-bold mb-3">Analyze usage</h3>
-              <p className="text-zinc-500">Our engine identifies seat overlaps, unused licenses, and better tier options based on team size.</p>
-            </div>
-            <div>
-              <div className="w-12 h-12 bg-blue-100 text-blue-600 rounded-xl flex items-center justify-center mb-6 text-xl font-bold">3</div>
-              <h3 className="text-xl font-bold mb-3">Cut costs</h3>
-              <p className="text-zinc-500">Get a personalized report with actionable steps to reduce your monthly AI bill by up to 30%.</p>
+            <div className="grid md:grid-cols-3 gap-12">
+              <div>
+                <div className="w-12 h-12 bg-blue-100 text-blue-600 rounded-xl flex items-center justify-center mb-6 text-xl font-bold">1</div>
+                <h3 className="text-xl font-bold mb-3">Connect your tools</h3>
+                <p className="text-zinc-500">List all the AI subscriptions your team is currently paying for across engineering and product.</p>
+              </div>
+              <div>
+                <div className="w-12 h-12 bg-blue-100 text-blue-600 rounded-xl flex items-center justify-center mb-6 text-xl font-bold">2</div>
+                <h3 className="text-xl font-bold mb-3">Analyze usage</h3>
+                <p className="text-zinc-500">Our engine identifies seat overlaps, unused licenses, and better tier options based on team size.</p>
+              </div>
+              <div>
+                <div className="w-12 h-12 bg-blue-100 text-blue-600 rounded-xl flex items-center justify-center mb-6 text-xl font-bold">3</div>
+                <h3 className="text-xl font-bold mb-3">Cut costs</h3>
+                <p className="text-zinc-500">Get a personalized report with actionable steps to reduce your monthly AI bill by up to 30%.</p>
+              </div>
             </div>
           </div>
         </section>
@@ -205,7 +215,7 @@ export default function Home() {
       </main>
 
       <footer className="py-12 px-6 border-t border-zinc-100 text-center">
-        <p className="text-zinc-400 text-sm">© {new Date().getFullYear()} SpendLens. All rights reserved.</p>
+        <p className="text-zinc-500 text-sm">© {new Date().getFullYear()} SpendLens. All rights reserved.</p>
       </footer>
     </div>
   );

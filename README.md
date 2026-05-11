@@ -102,7 +102,7 @@ Originally, users could type their monthly spend directly. This was changed so t
 
 ## Logs & Docs
 
-All required documentation lives in `/Logs`:
+All required documentation lives in Root Folder:
 
 | File | Contents |
 |------|----------|
