@@ -13,7 +13,7 @@ export async function POST(request: Request) {
   // Generate AI Summary
   result.aiSummary = await generateAuditSummary(result);
   
-  await saveAuditResult(result);
+  await saveAuditResult(result, data.email);
 
   return NextResponse.json({ id: result.id }, { status: 201 });
 }

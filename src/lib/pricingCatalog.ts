@@ -739,3 +739,52 @@ export function estimateApiBlendRate(
 function roundCurrency(value: number): number {
   return Math.round(value * 100) / 100;
 }
+
+export const PRICING_SNAPSHOT_VERSION = "2026-05-08";
+
+export const getCurrentPricingSnapshot = () => ({
+  version: PRICING_SNAPSHOT_VERSION,
+  catalog: TOOL_PRICING_CATALOG,
+});
+
+export function detectPricingChanges(snapshot: ReturnType<typeof getCurrentPricingSnapshot>): string[] {
+  const current = TOOL_PRICING_CATALOG;
+  const changedTools: string[] = [];
+
+  snapshot.catalog.forEach((oldTool: any) => {
+    const currentTool = current.find((t) => t.toolName === oldTool.toolName);
+    if (!currentTool) return;
+
+    // Compare fixed plans
+    oldTool.fixedPlans.forEach((oldPlan: any) => {
+      const currentPlan = currentTool.fixedPlans.find((p) => p.label === oldPlan.label);
+      if (
+        currentPlan &&
+        (currentPlan.monthlyPrice !== oldPlan.monthlyPrice ||
+          currentPlan.annualMonthlyPrice !== oldPlan.annualMonthlyPrice)
+      ) {
+        if (!changedTools.includes(oldTool.toolName)) {
+          changedTools.push(oldTool.toolName as string);
+        }
+      }
+    });
+
+    // Compare API profiles
+    oldTool.apiProfiles.forEach((oldProfile: any) => {
+      const currentProfile = currentTool.apiProfiles.find((p) => p.label === oldProfile.label);
+      if (
+        currentProfile &&
+        (currentProfile.standardInputPer1M !== oldProfile.standardInputPer1M ||
+          currentProfile.standardOutputPer1M !== oldProfile.standardOutputPer1M)
+      ) {
+        if (!changedTools.includes(oldTool.toolName)) {
+          changedTools.push(oldTool.toolName as string);
+        }
+      }
+    });
+  });
+
+  return changedTools;
+}
+
+

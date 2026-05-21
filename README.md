@@ -20,7 +20,7 @@
 ### Prerequisites
 - Node.js 22+
 - A Supabase project (free tier works)
-- Anthropic API key
+- Gemini API key (`GEMINI_API_KEY`)
 - Resend API key
 
 ### Install & Run Locally
