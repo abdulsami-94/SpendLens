@@ -8,6 +8,7 @@ import {
   getFixedPlan,
   getStandardMonthlySpend,
   getToolPricing,
+  getCurrentPricingSnapshot,
   type FixedPlanDefinition,
 } from "./pricingCatalog.ts";
 
@@ -49,6 +50,7 @@ export interface AuditResult {
   isOptimal: boolean;
   inputData: SpendFormData;
   aiSummary?: string;
+  pricingSnapshot?: ReturnType<typeof getCurrentPricingSnapshot>;
 }
 
 const CREDex_SAVINGS_THRESHOLD = 500;
@@ -89,6 +91,7 @@ export function runAudit(data: SpendFormData): AuditResult {
     showCredexCTA: totalSavingsMonthly >= CREDex_SAVINGS_THRESHOLD,
     isOptimal: totalSavingsMonthly <= OPTIMAL_SAVINGS_THRESHOLD,
     inputData: data,
+    pricingSnapshot: getCurrentPricingSnapshot(),
   };
 }
 

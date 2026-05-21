@@ -1,5 +1,6 @@
 import { supabaseAdmin as supabase } from "@/lib/supabase";
 import type { AuditResult } from "@/lib/auditEngine";
+import { getCurrentPricingSnapshot } from "@/lib/pricingCatalog";
 
 export type PublicAuditResult = Omit<AuditResult, "inputData"> & {
   createdAt: string;
@@ -33,13 +34,15 @@ export function sanitizeAuditResult(result: AuditResult): PublicAuditResult {
   return stripSensitiveValues(cloned) as PublicAuditResult;
 }
 
-export async function saveAuditResult(result: AuditResult): Promise<void> {
+export async function saveAuditResult(result: AuditResult, userEmail?: string): Promise<void> {
   const { error } = await supabase
     .from("audits")
     .insert({
       id: result.id,
       tools_data: result.inputData,
       results: result,
+      user_email: userEmail ?? null,
+      pricing_snapshot: getCurrentPricingSnapshot(),
     });
 
   if (error) {

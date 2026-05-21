@@ -4,7 +4,8 @@ import dynamic from "next/dynamic";
 import type { PublicAuditResult } from "@/lib/auditStore.server";
 import { useParams, useRouter } from "next/navigation";
 import { startTransition, useEffect, useState } from "react";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, AlertTriangle } from "lucide-react";
+import { detectPricingChanges } from "@/lib/pricingCatalog";
 
 const CredexLeadForm = dynamic(() => import("@/components/CredexLeadForm"));
 const NotifySignupForm = dynamic(() => import("@/components/NotifySignupForm"));
@@ -35,6 +36,7 @@ export default function AuditResultsPage({ initialData }: { initialData: PublicA
   const auditId = Array.isArray(params.id) ? params.id[0] : params.id;
   const router = useRouter();
   const [showLeadModal, setShowLeadModal] = useState(false);
+  const [changedTools, setChangedTools] = useState<string[]>([]);
 
   useEffect(() => {
     // Load lead modal on next frame to avoid blocking render
@@ -49,9 +51,40 @@ export default function AuditResultsPage({ initialData }: { initialData: PublicA
 
   const result = initialData;
 
+  useEffect(() => {
+    if (result.pricingSnapshot) {
+      const changes = detectPricingChanges(result.pricingSnapshot);
+      startTransition(() => {
+        setChangedTools(changes);
+      });
+    }
+  }, [result.pricingSnapshot]);
+
   return (
     <main className="min-h-screen bg-zinc-50 px-6 py-12 sm:px-10">
       <div className="mx-auto max-w-5xl">
+        {changedTools.length > 0 && (
+          <div className="mb-8 rounded-3xl border border-amber-200 bg-amber-50 p-8 shadow-sm">
+            <div className="flex items-center gap-3">
+              <AlertTriangle className="h-6 w-6 text-amber-600" />
+              <h2 className="text-lg font-bold text-amber-900">
+                Pricing Update Detected
+              </h2>
+            </div>
+            <p className="mt-3 text-amber-950">
+              The following tools have updated pricing since this audit was performed:{" "}
+              <span className="font-bold">{changedTools.join(", ")}</span>. 
+              The savings estimates below might be outdated based on current market rates.
+            </p>
+            <button
+              onClick={() => router.push("/")}
+              className="mt-4 text-sm font-bold text-amber-900 underline underline-offset-4 hover:text-amber-700"
+            >
+              Run a new audit with current prices
+            </button>
+          </div>
+        )}
+
         <div className="rounded-3xl bg-zinc-900 p-8 text-white shadow-xl sm:p-12">
           <div className="flex flex-col items-start justify-between gap-6 sm:flex-row sm:items-center">
             <div>
