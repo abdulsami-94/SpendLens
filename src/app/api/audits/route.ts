@@ -7,13 +7,12 @@ import type { SpendFormData } from "@/types";
 
 export async function POST(request: Request) {
   console.log("API POST /api/audits triggered, GEMINI_API_KEY defined:", !!process.env.GEMINI_API_KEY);
-  const data = (await request.json()) as SpendFormData;
-  const result = runAudit(data);
+  const body = await request.json() as SpendFormData & { email?: string };
+  const result = runAudit(body);
   
-  // Generate AI Summary
   result.aiSummary = await generateAuditSummary(result);
   
-  await saveAuditResult(result, data.email);
+  await saveAuditResult(result, body.email);
 
   return NextResponse.json({ id: result.id }, { status: 201 });
 }
