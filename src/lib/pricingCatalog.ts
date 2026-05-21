@@ -138,7 +138,7 @@ export const TOOL_PRICING_CATALOG: readonly ToolPricingDefinition[] = [
       {
         label: "Pro",
         category: "consumer",
-        monthlyPrice: 25,
+        monthlyPrice: 20,
         order: 1,
         source: SOURCES.cursor,
       },

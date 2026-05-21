@@ -50,10 +50,14 @@ export async function POST() {
 
       // 4. Mark all their affected audits as notified
       const ids = affected.map((a) => a.auditId);
-      await supabase
+    const { error: updateError } = await supabase
         .from("audits")
         .update({ notified_at: new Date().toISOString() })
         .in("id", ids);
+
+    if (updateError) {
+        console.error("Failed to update notified_at:", updateError);    
+    }
 
       notifiedIds.push(...ids);
     } catch (err) {
