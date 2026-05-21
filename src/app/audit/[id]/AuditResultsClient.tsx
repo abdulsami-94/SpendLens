@@ -54,7 +54,9 @@ export default function AuditResultsPage({ initialData }: { initialData: PublicA
   useEffect(() => {
     if (result.pricingSnapshot) {
       const changes = detectPricingChanges(result.pricingSnapshot);
-      setChangedTools(changes);
+      startTransition(() => {
+        setChangedTools(changes);
+      });
     }
   }, [result.pricingSnapshot]);
 
