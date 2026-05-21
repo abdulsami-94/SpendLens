@@ -49,6 +49,12 @@ export async function POST(request: Request) {
       );
     }
 
+  // Backfill email onto the audit row
+  await supabase
+    .from("audits")
+    .update({ user_email: email })
+    .eq("id", auditId);
+
     // Send confirmation email
     const { error: emailError } = await resend.emails.send({
       from: "SpendLens <onboarding@resend.dev>",
